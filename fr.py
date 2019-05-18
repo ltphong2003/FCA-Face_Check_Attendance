@@ -63,32 +63,32 @@ def update(name):
             if ((now<today8am)and(now>today7am)):
                 kq=True
                 with open(file_name, mode='r') as fileread:
-                    att_reader = csv.reader(fileread, delimiter=';')
+                    att_reader = csv.reader(fileread, delimiter=',')
                     for row in att_reader:
                         if ((row[0]==name)and(row[1]=="Check in")):
                             kq=False
                     fileread.close()
                 with open(file_name, mode='w') as localtime_file:
-                    att_writer = csv.writer(localtime_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    att_writer = csv.writer(localtime_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     att_writer.writerow([name,"Check in", time.asctime(localtime)])
                     localtime_file.close()
             if ((now<today5pm)and(now>today4pm)):
                 kq=True
                 with open(file_name, mode='r') as fileread:
-                    att_reader = csv.reader(fileread, delimiter=';')
+                    att_reader = csv.reader(fileread, delimiter=',')
                     for row in att_reader:
                         if ((row[0]==name)and(row[1]=="Check out")):
                             kq=False 
                     fileread.close()
                 with open(file_name, mode='w') as localtime_file:
-                    att_writer = csv.writer(localtime_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    att_writer = csv.writer(localtime_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     att_writer.writerow([name,"Check out", time.asctime(localtime)])
                     localtime_file.close()
             a=2
         except IOError:
             f= open(file_name,"w+")
             f.close()
-            print("Next entry.")
+            print("No file found")
 
     return name
 
