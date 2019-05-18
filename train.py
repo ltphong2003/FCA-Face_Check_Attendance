@@ -73,5 +73,5 @@ def train(train_dir, model_save_path=None, n_neighbors=None, knn_algo='ball_tree
 # STEP 1: Train the KNN classifier and save it to disk
 # Once the model is trained and saved, you can skip this step next time.
 print("Training KNN classifier...")
-classifier = train("data", model_save_path="trained_knn_model.clf", n_neighbors=2)
+classifier = train("data", model_save_path="trained_knn_model.clf")
 print("Training complete!")
