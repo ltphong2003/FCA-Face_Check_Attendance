@@ -5,15 +5,17 @@ import os
 import os.path
 import pickle
 from PIL import Image, ImageDraw
-import face_recognition
-from face_recognition.face_recognition_cli import image_files_in_folder
 import time 
 import datetime
 import csv
-
+import api as face_recognition 
+import re
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-def predict(X_img, knn_clf=None, model_path=None, distance_threshold=0.475):
+def image_files_in_folder(folder):
+    return [os.path.join(folder, f) for f in os.listdir(folder) if re.match(r'.*\.(jpg|jpeg|png)', f, flags=re.I)]
+        
+def predict(X_img, knn_clf=None, model_path=None, distance_threshold=0.375):
     """
     Recognizes faces in given image using a trained KNN classifier
     :param X_img_path: path to image to be recognized
@@ -51,7 +53,7 @@ def predict(X_img, knn_clf=None, model_path=None, distance_threshold=0.475):
 
 def update(name):
     now = datetime.datetime.now()
-    today8am = now.replace(hour=9, minute=30, second=0, microsecond=0)
+    today8am = now.replace(hour=8, minute=0, second=0, microsecond=0)
     today7am = now.replace(hour=7, minute=0, second=0, microsecond=0)
     today5pm = now.replace(hour=17, minute=0, second=0, microsecond=0)
     today4pm = now.replace(hour=16, minute=0, second=0, microsecond=0)
@@ -88,14 +90,13 @@ def update(name):
         except IOError:
             f= open(file_name,"w+")
             f.close()
-            print("No file found")
 
     return name
 
 if __name__ == "__main__":
     # STEP 2: Using the trained classifier, make predictions for unknown images
         # Find all people in the image using a trained classifier model
-        # Note: You can pass in either a classifier file name or a classifier model instance
+        # Note: Pass in either a classifier file name or a classifier model instance
     cap = cv2.VideoCapture(0)
     fourcc = cv2.VideoWriter_fourcc(*'MP4V')
 
@@ -125,12 +126,14 @@ if __name__ == "__main__":
             predictions = predict(rgb_small_frame, model_path="trained_knn_model.clf")
         font = cv2.FONT_HERSHEY_DUPLEX
         localtime = time.asctime( time.localtime(time.time()) )
-        cv2.putText(frame, localtime, (200, 40), font, 1.0, (255, 255, 255), 1)
+        cv2.putText(frame, localtime, (190, 40), font, 1.0, (255, 255, 255), 1)
         for name,(top, right, bottom, left) in predictions:
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-            process=update(name)
-            cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+            if (name!="Unknown"):
+                process=update(name)
+            fontScale = (29 * abs(left-right)) / (1000*8)
+            cv2.putText(frame, name, (left + 6, bottom - 6), font, fontScale, (255, 255, 255), 1)
 
         cv2.imshow('Face Check Attendance', frame)
         out.write(frame)
